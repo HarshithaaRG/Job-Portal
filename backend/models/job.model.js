@@ -10,10 +10,14 @@ const jobSchema=new mongoose.Schema({
         unique:true
     },
     requirements:[{
-        type:Number,
+        type:String,
         required:true
     }],
     salary:{
+        type:Number,
+        required:true
+    },
+    experienceLevel:{
         type:Number,
         required:true
     },
@@ -42,7 +46,7 @@ const jobSchema=new mongoose.Schema({
     applications:[
         {
             type:mongoose.Schema.Types.ObjectId,
-            ref:Application
+            ref:'Application'
         }
     ]
 },{timestamps:true})
