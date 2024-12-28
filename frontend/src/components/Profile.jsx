@@ -4,15 +4,16 @@ import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
 import { Button } from './ui/button';
 import { Pen, Mail, Contact } from 'lucide-react';
 import { Badge } from './ui/badge'
+import AppliedJobsTable from './AppliedJobsTable';
 
 const skills = ["Html", "Css", "Javascript", "Node js"]
 
 const Profile = () => {
-    const isResume=true
+    const isResume = true
     return (
         <div>
             <Navbar />
-            <div className='mx-auto max-w-7xl bg-white border border-gray-200 rounded-2xl my-5 p-8'>
+            <div className='mx-auto max-w-4xl bg-white border border-gray-200 rounded-2xl my-5 p-8'>
                 <div className='flex justify-between'>
                     <div className='flex items-center gap-4'>
                         <Avatar className='h-10 w-10'>
@@ -47,15 +48,17 @@ const Profile = () => {
 
                 </div>
                 <div className='grid w-full max-w-sm items-center gap-1.5'>
-                    <label className='text-md font-bold'>Resume</label> 
+                    <label className='text-md font-bold'>Resume</label>
                     {
-                        isResume?<a target='blank' href='https://youtube.com' className='text-blue-500 w-full hover:underline cursor-pointer'>Your Resume</a> : <span>NA</span>
+                        isResume ? <a target='blank' href='https://youtube.com' className='text-blue-500 w-full hover:underline cursor-pointer'>Your Resume</a> : <span>NA</span>
                     }
                 </div>
-                <div className='max-w-4xl mx-auto bg-white rounded-2xl'>
-                    <h1>Applied Jobs</h1>
 
-                </div>
+            </div>
+            <div className='max-w-4xl mx-auto bg-white rounded-2xl'>
+                <h1 className='font-bold text-lg my-5'>Applied Jobs</h1>
+                <AppliedJobsTable />
+
             </div>
         </div>
     )
