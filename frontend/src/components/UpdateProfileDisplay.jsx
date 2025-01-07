@@ -4,7 +4,8 @@ import {React,useState}from 'react'
 import { Button } from './ui/button';
 import { Loader2 } from 'lucide-react';
 import {Label} from './ui/label'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { USER_API_END_POINT } from '@/utils/constant';
 
 const UpdateProfileDisplay = ({ open, setOpen }) => {
     const [loading, setLoading] = useState(false)
@@ -17,6 +18,7 @@ const UpdateProfileDisplay = ({ open, setOpen }) => {
         skills:user?.profile?.skills?.map(skill=>skill),
         file:user?.profile?.resume
     })
+    const dispatch=useDispatch();
 
     const changeEventHandler=(e)=>{
         setInput({...input,[e.target.name]:e.target.value})
@@ -42,13 +44,24 @@ const UpdateProfileDisplay = ({ open, setOpen }) => {
         }
         try{
 
-            const res=await axios.put()
+            const res=await axios.post(`${USER_API_END_POINT}/profile/update`,formData,{
+                headers:{
+                    'Content-Type':'multipart/form-data'
+                },
+                withCredentials: true
+            })
+            if(res.data.success){
+                dispatch(res.data.user);
+                toast.success(res.data.message);
+            }
         }
         catch(error){
+            console.log(error);
+            toast.error(error.response.data.message);
 
         }
-
-
+        setOpen(false);
+        console.log(input);
     }
     return (
         <div>
