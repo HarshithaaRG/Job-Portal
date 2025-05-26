@@ -98,29 +98,45 @@ export const getApplicants=async(req,res)=>{
         console.log(error);
     }
 }
-export const updateStatus=async(req,res)=>{
-    try{
-        const {status}=req.body;
-        const applicationId=req.params.id;
+export const updateStatus = async (req,res) => {
+    try {
+        const {status} = req.body;
+        const applicationId = req.params.id;
         if(!status){
             return res.status(400).json({
                 message:'status is required',
                 success:false
             })
-        }
-        //find the application by application id
-        const application=await Application.findOne({_id:applicationId})
+        };
+
+        // find the application by applicantion id
+        const application = await Application.findOne({_id:applicationId});
         if(!application){
-            return res.status(400).json({
-                message:'Application not found',
+            return res.status(404).json({
+                message:"Application not found.",
                 success:false
             })
-        }
-        //update status
-        application.status=status.toLowerCase();
+        };
+
+        // update the status
+        application.status = status.toLowerCase();
         await application.save();
+
         return res.status(200).json({
-            message:'Status updated successfully',
+            message:"Status updated successfully.",
+            success:true
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const deleteapplicationofjob=async(req,res)=>{
+    try{
+        const id=req.params.id;
+        await Application.deleteMany({job:id})
+        return res.status(200).json({
+            message:'Applications successfully deleted',
             success:true
         })
 
@@ -128,4 +144,4 @@ export const updateStatus=async(req,res)=>{
     catch(error){
         console.log(error);
     }
-}
+}    
