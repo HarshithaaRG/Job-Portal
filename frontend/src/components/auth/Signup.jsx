@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import Navbar from '../shared/Navbar';
 import { Input } from '../ui/input'
 import { Label } from "../ui/label"
@@ -22,7 +22,7 @@ const Signup = () => {
         role:"",
         file:""
     });
-    const {loading}=useSelector(store=>store.auth);
+    const {loading,user}=useSelector(store=>store.auth);
     const navigate=useNavigate();
     const dispatch=useDispatch();
     const changeEventHandler=(e)=>{
@@ -70,6 +70,11 @@ const Signup = () => {
         }
 
     }
+    useEffect(()=>{
+        if(user){
+            navigate("/");
+        }
+    },[])
     return (
         <div>
             <Navbar />

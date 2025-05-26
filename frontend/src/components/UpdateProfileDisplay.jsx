@@ -6,62 +6,64 @@ import { Loader2 } from 'lucide-react';
 import {Label} from './ui/label'
 import { useDispatch, useSelector } from 'react-redux';
 import { USER_API_END_POINT } from '@/utils/constant';
+import { toast } from 'sonner';
+import axios from 'axios';
+import { setAuthUser } from '@/redux/authSlice';
 
 const UpdateProfileDisplay = ({ open, setOpen }) => {
-    const [loading, setLoading] = useState(false)
-    const {user}=useSelector(store=>store.auth)
-    const [input,setInput]=useState({
-        fullname:user?.fullname,
-        email:user?.email,
-        phoneNumber:user?.phoneNumber,
-        bio:user?.profile?.bio,
-        skills:user?.profile?.skills?.map(skill=>skill),
-        file:user?.profile?.resume
-    })
-    const dispatch=useDispatch();
+    const [loading, setLoading] = useState(false);
+    const { user } = useSelector(store => store.auth);
 
-    const changeEventHandler=(e)=>{
-        setInput({...input,[e.target.name]:e.target.value})
+    const [input, setInput] = useState({
+        fullname: user?.fullname || "",
+        email: user?.email || "",
+        phoneNumber: user?.phoneNumber || "",
+        bio: user?.profile?.bio || "",
+        skills: user?.profile?.skills?.map(skill => skill) || "",
+        file: user?.profile?.resume || ""
+    });
+    const dispatch = useDispatch();
+
+    const changeEventHandler = (e) => {
+        setInput({ ...input, [e.target.name]: e.target.value });
     }
 
-    const fileChangeHandler=(e)=>{
-        const file=e.target.files?.[0];
-        setInput({...input,file})
-
+    const fileChangeHandler = (e) => {
+        const file = e.target.files?.[0];
+        setInput({ ...input, file })
     }
 
-    const submitHandler= async (e)=>{
-        
+    const submitHandler = async (e) => {
         e.preventDefault();
-        const formData=new FormData();
-        formData.append("fullname",input.fullname);
-        formData.append("email",input.email);
-        formData.append("phoneNumber",input.phoneNumber);
-        formData.append("bio",input.bio);
-        formData.append("skills",input.skills);
-        if(input.file){
-            formData.append("file",input.file)
+        const formData = new FormData();
+        formData.append("fullname", input.fullname);
+        formData.append("email", input.email);
+        formData.append("phoneNumber", input.phoneNumber);
+        formData.append("bio", input.bio);
+        formData.append("skills", input.skills);
+        if (input.file) {
+            formData.append("file", input.file);
         }
-        try{
-
-            const res=await axios.post(`${USER_API_END_POINT}/profile/update`,formData,{
-                headers:{
-                    'Content-Type':'multipart/form-data'
+        try {
+            setLoading(true);
+            const res = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 },
                 withCredentials: true
-            })
-            if(res.data.success){
-                dispatch(res.data.user);
+            });
+            if (res.data.success) {
+                dispatch(setAuthUser(res.data.user));
                 toast.success(res.data.message);
             }
-        }
-        catch(error){
+        } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
-
+            toast.error(error.response.data.message)||"Something went wrong";
+        } finally{
+            setLoading(false);
         }
         setOpen(false);
-        console.log(input);
+        
     }
     return (
         <div>
@@ -76,27 +78,27 @@ const UpdateProfileDisplay = ({ open, setOpen }) => {
                         <div className='grid gap-4 py-4'>
                             <div className='grid grid-cols-4 items-center gap-4'>
                                 <Label htmlFor='name' className='text-right '>Name</Label>
-                                <input id='name' className='col-span-3 border' name='name' type='text' value={input.fullname} onchange={changeEventHandler}/>
+                                <input id='name' className='col-span-3 border' name='fullname' type='text' value={input.fullname} onChange={changeEventHandler}/>
 
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
                                 <Label htmlFor='email' className='text-right '>Email</Label>
-                                <input id='email' className='col-span-3 border' name='email' type='email' value={input.email} onchange={changeEventHandler} />
+                                <input id='email' className='col-span-3 border' name='email' type='email' value={input.email} onChange={changeEventHandler} />
 
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
                                 <Label htmlFor='number' className='text-right '>Phone Number</Label>
-                                <input id='number' className='col-span-3 border' name='number' value={input.phoneNumber} onchange={changeEventHandler}/>
+                                <input id='number' className='col-span-3 border' name='phoneNumber' value={input.phoneNumber} onChange={changeEventHandler}/>
 
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
                                 <Label htmlFor='bio' className='text-right '>Bio</Label>
-                                <input id='bio' className='col-span-3 border' name='bio' value={input.bio} onchange={changeEventHandler} />
+                                <input id='bio' className='col-span-3 border' name='bio' value={input.bio} onChange={changeEventHandler} />
 
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>
                                 <Label htmlFor='skills' className='text-right '>Skills</Label>
-                                <input id='skills' className='col-span-3 border' name='skills' onchange={changeEventHandler} />
+                                <input id='skills' className='col-span-3 border' name='skills' value={input.skills} onChange={changeEventHandler} />
 
                             </div>
                             <div className='grid grid-cols-4 items-center gap-4'>

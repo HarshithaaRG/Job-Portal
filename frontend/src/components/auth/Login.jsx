@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../shared/Navbar';
 import { Input } from '../ui/input'
 import { Label } from "../ui/label"
@@ -9,7 +9,7 @@ import {toast} from 'sonner'
 import axios from 'axios'
 import { USER_API_END_POINT } from '@/utils/constant';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoading } from '@/redux/authSlice';
+import { setAuthUser, setLoading } from '@/redux/authSlice';
 import { Loader2 } from 'lucide-react';
 
 
@@ -19,7 +19,7 @@ const Login = () => {
         password: "",
         role: ""
     });
-    const {loading}=useSelector(store=>store.auth)
+    const {loading,user}=useSelector(store=>store.auth)
     const navigate=useNavigate();
     const dispatch=useDispatch();
     const changeEventHandler = (e) => {
@@ -37,7 +37,7 @@ const Login = () => {
                     withCredentials:true
                 })
                 if(res.data.success){
-                    dispatch(setUser(res.data.user))
+                    dispatch(setAuthUser(res.data.user))
                     navigate("/")
                     toast.success(res.data.message);
                 }
@@ -56,6 +56,11 @@ const Login = () => {
             }
     
     }
+    useEffect(()=>{
+        if(user){
+            navigate("/");
+        }
+    },[])
     return (
         <div>
             <Navbar />
@@ -87,7 +92,7 @@ const Login = () => {
                         loading? <Button className='w-full my-4 '><Loader2 className='mr-2 h-4 w-4 animate-spin'/>Please Wait</Button>:<Button type='submit' className='w-full my-4'>Login</Button>
                     }
                     
-                    <span>Don't  have an account?</span><Link to='/login' className='text-blue-600'>Signup</Link>
+                    <span>Don't  have an account?</span><Link to='/signup' className='text-blue-600'>Signup</Link>
                 </form>
             </div>
         </div>
