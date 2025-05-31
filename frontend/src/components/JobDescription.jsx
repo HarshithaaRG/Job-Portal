@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from '@/utils/constant';
 import { setSingleJob } from '@/redux/jobSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ const JobDescription = () => {
     
     const params=useParams();//hook to extract url parameters
     const jobId=params.id;
+    const navigate=useNavigate();
     const {singleJob}=useSelector(store=>store.job);//the job object currently in the redux store
     const {user}=useSelector(store=>store.auth);//the currently logged-in user from authslice of the store
     const isInitiallyApplied=singleJob?.applications?.some(application=>application.applicant==user?._id) || false 
@@ -35,6 +36,11 @@ const JobDescription = () => {
             toast.error(error.response.data.message);
         }
     }
+     useEffect(() => {
+        if (!user) {
+            navigate('/signup');
+        }
+    }, [user, navigate]);
     useEffect(()=>{//useeffect runs when component mounts of when any dependency (jobid, dispatch or user if changes)
         const fetchSingleJob= async()=>{
             try{
@@ -51,7 +57,9 @@ const JobDescription = () => {
             }
         }
         fetchSingleJob();
+        
     },[jobId,dispatch,user?._id])
+    
     return (
         <div className='max-w-6xl mx-auto my-10'>
             <div className='flex items-center justify-between'>
@@ -83,7 +91,7 @@ const JobDescription = () => {
                 <h1 className='font-bold my-1'>Experience: <span className='pl-4 font-normal text-gray-800'>{singleJob?.experienceLevel} years</span></h1>
                 <h1 className='font-bold my-1'>Salary: <span className='pl-4 font-normal text-gray-800'>{singleJob?.salary} LPA</span></h1>
                 <h1 className='font-bold my-1'>Total Applicants: <span className='pl-4 font-normal text-gray-800'>{singleJob?.applications?.length}</span></h1>
-                <h1 className='font-bold my-1'>Posted Date: <span className='pl-4 font-normal text-gray-800'>{singleJob?.createdAt.split("T")[0]}</span></h1>
+                <h1 className='font-bold my-1'>Posted Date: <span className='pl-4 font-normal text-gray-800'>{singleJob?.createdAt.split("T")[0].split('-').reverse().join('-')}</span></h1>
             </div>
 
         </div>

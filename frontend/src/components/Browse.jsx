@@ -4,13 +4,20 @@ import Job from './Job'
 import { useDispatch, useSelector } from 'react-redux';
 import { setSearchedQuery } from '@/redux/jobSlice';
 import useGetAllJobs from '@/hooks/useGetAllJobs';
+import {useNavigate } from 'react-router-dom';
 
-const randomJobs = [1, 2, 3];
 
 const Browse = () => {
     useGetAllJobs();
+    const{user}=useSelector(store=>store.auth);
+    const navigate=useNavigate();
     const {allJobs} = useSelector(store=>store.job);
     const dispatch = useDispatch();
+    useEffect(()=>{
+        if(!user){
+            navigate('/signup');
+        }
+    })
     useEffect(()=>{
         return ()=>{
             dispatch(setSearchedQuery(""));

@@ -18,14 +18,14 @@ const Home=()=>{
     }
   }, []);
     return (
-        <>
+        <div className='bg-blue-100'>
             <Navbar/>
             <HeroSection/>
             <CategoryCarousel/>
             <LatestJobs/>
             <Footer/>
             
-        </>
+        </div>
 
     )
 }
