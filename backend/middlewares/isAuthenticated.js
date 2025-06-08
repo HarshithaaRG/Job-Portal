@@ -15,7 +15,7 @@ export const isAuthenticated=async (req,res,next)=>{
                 success:false
             })
         }
-        req.id=decode.userId;
+        req.id=decode.userId;//sets req.id to decode.userId as decode returns the payload which is the userid
         next();
 
     }
