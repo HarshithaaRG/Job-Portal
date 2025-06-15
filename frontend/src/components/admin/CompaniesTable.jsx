@@ -43,7 +43,7 @@ const CompaniesTable = () => {
                                     </Avatar>
                                 </TableCell>
                                 <TableCell>{company.name}</TableCell>
-                                <TableCell>{company.createdAt.split("T")[0]}</TableCell>
+                                <TableCell>{company.createdAt.split("T")[0].split('-').reverse().join('-')}</TableCell>
                                 <TableCell>{company.location}</TableCell>
                                 <TableCell className="cursor-pointer">
                                     <Popover>
