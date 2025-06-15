@@ -3,6 +3,13 @@ import bcrypt from "bcryptjs"
 import jwt from 'jsonwebtoken'
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
+import { spawn } from 'child_process';
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const register=async (req , res)=>{
     try{
         const {fullname, email,phoneNumber, password,role}=req.body;
@@ -114,7 +121,7 @@ export const updateProfile=async(req,res)=>{
         const file=req.file;
 
         const fileUri=getDataUri(file);
-        const cloudResponse=await cloudinary.uploader.upload(fileUri.content);
+        const cloudResponse=await cloudinary.uploader.upload(fileUri.content,{resource_type:"raw"});
         
         let skillsArray;
         if(skills){
@@ -141,6 +148,9 @@ export const updateProfile=async(req,res)=>{
             user.profile.resume=cloudResponse.secure_url//save the cloudinary url
             user.profile.resumeOriginalName=file.originalname//save the original file name
         }
+        console.log("Uploading file:", file.originalname);
+        console.log("File URI:", fileUri.content.substring(0, 100));
+        console.log("Cloudinary Response:", cloudResponse);
 
         await user.save()
 
@@ -152,6 +162,8 @@ export const updateProfile=async(req,res)=>{
             role:user.role,
             profile:user.profile
         }
+        
+
         return res.status(200).json({
             message:'Profile updated successfully',
             user,
@@ -160,4 +172,36 @@ export const updateProfile=async(req,res)=>{
     }catch(error){
         console.log(error)
     }
+}
+
+export const analyse_resume=async(req,res)=>{
+    const resumePath = req.file.path;
+    const jobDescription = req.body.jd;
+    console.log("req.file:", req.file);
+    console.log("req.body:", req.body);
+
+
+    const pythonProcess = spawn('python', [
+        path.join(__dirname, "..", 'gemini_ats.py'),
+        resumePath,
+        jobDescription,
+    ]);
+
+    let data = '';
+    pythonProcess.stdout.on('data', (chunk) => {
+        data += chunk.toString();
+    });
+
+    pythonProcess.stderr.on('data', (err) => {
+        console.error('Python error:', err.toString());
+    });
+
+    pythonProcess.on('close', (code) => {
+        fs.unlinkSync(resumePath); // delete the uploaded file
+        if (code === 0) {
+        res.json({ result: data.trim() });
+        } else {
+        res.status(500).json({ error: 'Python script failed' });
+        }
+    });
 }
